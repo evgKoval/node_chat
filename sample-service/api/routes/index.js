@@ -1,16 +1,15 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
+const UserController = require('../controllers/UserController');
+const MainController = require('../controllers/MainController');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-    sess = req.session;
+router.get('/', MainController.index);
 
-    if(sess.user_id) {
-        res.render('index.jade');
-    } else {
-        res.redirect('/login');
-    }
-});
+router.get('/login', UserController.login);
+router.post('/login', UserController.logining);
+
+router.get('/register', UserController.register);
+router.post('/register', UserController.store);
 
 module.exports = router;
