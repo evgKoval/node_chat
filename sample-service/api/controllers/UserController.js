@@ -8,9 +8,6 @@ exports.register = function(request, response) {
     response.render('register.jade', {
         user: request.session.user_id
     });
-    // response.render("users.hbs", {
-    //     users: User.getAll()
-    // });
 };
 
 exports.store = function(request, response) {
