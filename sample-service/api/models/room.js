@@ -79,4 +79,27 @@ module.exports = class Room {
             )
         })
     }
+
+    static sendMessage(userId, roomId, message) {
+        return new Promise((resolve, reject) => {
+            const sql = 'INSERT INTO messages (user_id, room_id, message_text) VALUES ?;';
+            const values = [
+                [userId, roomId, message]
+            ];
+            
+            connection.query(sql, [values],
+                function(err, results) {
+                    if(err) reject(err);
+
+                    if(!results) {
+                        resolve(null);
+                        //return null;
+                    }
+
+                    resolve(results);
+                    //return results;
+                }
+            )
+        })
+    }
 }

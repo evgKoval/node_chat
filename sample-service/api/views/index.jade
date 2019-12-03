@@ -2,7 +2,7 @@ extends layout
 
 block content
   h1 Chat
-  strong.d-block.mb-3= user
+  strong.d-block.mb-3.user-email= user
   div.card
     div.card-body
       div.row
@@ -12,11 +12,12 @@ block content
               li.list-group-item.room-item(data-id=room.id)= room.name
         div.col-9
           div.messages
-          form(method='POST')
+          form(method='POST', action='/api/chat/message')
             div.input-group.input-send
-              input.form-control(type='text', placeholder='...')
+              input(type='hidden', name='room' value='0')
+              input.form-control(type='text', placeholder='...', name='message')
               div.input-group-append
-                button.btn.btn-primary(type='submit') Send
+                button.btn.btn-primary.btn-send(type='submit') Send
 
   script
     include ../public/javascript/chats.js

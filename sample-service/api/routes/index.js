@@ -14,5 +14,6 @@ router.get('/register', UserController.register);
 router.post('/register', UserController.store);
 
 router.get('/api/chat/:id', ChatController.show);
+router.post('/api/chat/message', ChatController.message);
 
 module.exports = router;
