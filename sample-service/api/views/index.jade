@@ -2,5 +2,21 @@ extends layout
 
 block content
   h1 Chat
-  strong= user
-  p efkeof
+  strong.d-block.mb-3= user
+  div.card
+    div.card-body
+      div.row
+        div.col-3
+          ul.list-group.list-group-flush
+            each room in rooms
+              li.list-group-item.room-item(data-id=room.id)= room.name
+        div.col-9
+          div.messages
+          form(method='POST')
+            div.input-group.input-send
+              input.form-control(type='text', placeholder='...')
+              div.input-group-append
+                button.btn.btn-primary(type='submit') Send
+
+  script
+    include ../public/javascript/chats.js

@@ -5,3 +5,44 @@ body {
 a {
   color: #00B7FF;
 }
+
+.card-body {
+  padding: 0;
+}
+
+.list-group {
+  width: 112%;
+}
+
+.input-send .form-control {
+  border-radius: 0;
+}
+
+.messages {
+  min-height: 480px;
+  position: relative;
+  z-index: 1;
+  padding: 1rem;
+}
+
+.messages::before {
+  content: "";
+  position: absolute;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;  
+  opacity: .2; 
+  z-index: -1;
+  background: rgba(0, 0, 0, 0.5) url('../images/bg.jpg') no-repeat;
+  background-size: cover;
+}
+
+.room-item {
+  cursor: pointer;
+  transition: .15s;
+}
+
+.room-item:not(.active):hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}

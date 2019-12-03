@@ -1,4 +1,3 @@
-const session = require('express-session');
 var DataBaseHandler = require("../config/DataBaseHandler");
 var dataBaseHandler = new DataBaseHandler();
 
