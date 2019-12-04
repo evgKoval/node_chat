@@ -44,7 +44,7 @@ module.exports = class Room {
 
     static ownRooms(userId) {
         return new Promise((resolve, reject) => {
-            const sql = "SELECT id, name FROM rooms r LEFT JOIN chat_users c ON c.room_id = r.id WHERE c.user_id = ?";
+            const sql = "SELECT r.id, r.name FROM rooms r LEFT JOIN chat_users c ON c.room_id = r.id WHERE c.user_id = ?";
             connection.query(sql, [userId],
                 function(err, results) {
                     if(err) reject(err);
@@ -100,6 +100,55 @@ module.exports = class Room {
                     //return results;
                 }
             )
+        })
+    }
+
+    static createRoom(userId, roomName) {
+        return new Promise((resolve, reject) => {
+            const sql = 'INSERT INTO rooms (created_by, name) VALUES ?;';
+            const values = [
+                [userId, roomName]
+            ];
+
+            connection.query(sql, [values],
+                function(err, results) {
+                    if(err) reject(err);
+
+                    if(!results) {
+                        resolve(null);
+                        //return null;
+                    }
+
+                    resolve(results);
+                    //return results;
+                }
+            )
+        })
+    }
+
+    static joinUsersToRoom(roomId, roomUsers) {
+        return new Promise((resolve, reject) => {
+            let result = [];
+            roomUsers.forEach((user) => {
+                const sql = 'INSERT INTO chat_users (room_id, user_id) VALUES ?;';
+                const values = [
+                    [roomId, user]
+                ];
+
+                connection.query(sql, [values],
+                    function(err, results) {
+                        if(err) reject(err);
+    
+                        if(!results) {
+                            result = null;
+                        }
+    
+                        result = results;
+                    }
+                )
+            });
+
+            resolve(result);
         })
     }
 }

@@ -13,7 +13,10 @@ router.post('/login', UserController.logining);
 router.get('/register', UserController.register);
 router.post('/register', UserController.store);
 
+router.post('/logout', UserController.logout);
+
 router.get('/api/chat/:id', ChatController.show);
+router.post('/api/chat', ChatController.store);
 router.post('/api/chat/message', ChatController.message);
 
 module.exports = router;
