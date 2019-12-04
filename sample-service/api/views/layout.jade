@@ -1,7 +1,7 @@
 doctype html
 html
   head
-    title Chat
+    title ChatJS
     link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
     script(src='https://code.jquery.com/jquery-3.4.1.min.js')
@@ -9,5 +9,15 @@ html
     script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js')
     script(src='/javascript/index.js')
   body
+    nav.navbar.navbar-expand-lg
+      a.navbar-brand.mr-auto(href='/') ChatJS
+      div.navbar-nav
+        div.btn-group
+          if userId
+            form(method='POST', action='/logout')
+              button.btn.btn-outline-primary(type='submit') Logout
+          else
+            a.btn.btn-outline-primary.nav-link(href='/login') Login
+            a.btn.btn-outline-primary.nav-link(href='/register') Register   
     div.container
       block content

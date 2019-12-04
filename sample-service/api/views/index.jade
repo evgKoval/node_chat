@@ -1,15 +1,18 @@
 extends layout
 
 block content
-  h1 Chat
-  strong.d-block.mb-3.user-email= user
+  div.mt-4.mb-3
+    span Welcome, 
+    strong.user-email= user
   div.card
     div.card-body
       div.row
         div.col-3
-          ul.list-group.list-group-flush
+          ul.list-group.list-group-flush.list-rooms
             each room in rooms
               li.list-group-item.room-item(data-id=room.id)= room.name
+            li.list-group-item 
+              a.room-create(href='#', data-toggle='modal', data-target='#modal-create') Create a new room
         div.col-9
           div.messages
           form(method='POST', action='/api/chat/message')
@@ -18,6 +21,27 @@ block content
               input.form-control(type='text', placeholder='...', name='message')
               div.input-group-append
                 button.btn.btn-primary.btn-send(type='submit') Send
+
+  div#modal-create.modal.fade(tabindex='-1', role='dialog')
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          h5.modal-title Create a new room
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') &times;
+        div.modal-body
+          form(method='POST', action='/api/chat')
+            div.input-group.input-chat-name.mb-3
+              input.form-control(type='text', placeholder='Room name', name='name')
+            p Join users into the room
+            select.custom-select(multiple, name='users')
+              each form_user in users
+                if form_user.email == user
+                  - continue
+                option(value=form_user.id)= form_user.email
+        div.modal-footer
+          button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+          button.btn.btn-primary.btn-create(type='button') Create
 
   script
     include ../public/javascript/chats.js

@@ -64,6 +64,56 @@ $(document).ready(function() {
             }
         });
     })
+
+    $('.btn-create').on('click', function(e) {
+        e.preventDefault();
+
+        var inputName = $('#modal-create').find('input[name="name"]');
+        var selectUsers = $('#modal-create').find('select[name="users"]');
+        var roomName = inputName.val();
+        
+        if(roomName == '') {
+            inputName.addClass('is-invalid')
+            return;
+        } else {
+            inputName.removeClass('is-invalid')
+        }
+
+        $(this).attr('disabled','disabled');
+
+        $.ajax({
+            type: 'POST',
+            url: 'api/chat',
+            data: {
+                'name': inputName.val(),
+                'users': selectUsers.val()
+            },
+            success: function (response) {
+                $('.list-group-item:last').before('\
+                    <li data-id="' + response.room_id + '" class="list-group-item room-item">\
+                        ' + response.room_name + '\
+                    </li>\
+                ');
+
+                $('.room-item:last').on("click", function () {
+                    $('input[name="message"]').removeClass('is-invalid');
+                    $('.room-item').removeClass('active');
+        
+                    $(this).addClass('active');
+                    $('form').find('input[name="room"]').val($(this).data('id'));
+        
+                    getMessages($(this).data('id'));
+                });
+
+                $('#modal-create').modal('hide');
+                $('#modal-create').find('input[name="name"]').val('');
+                $('#modal-create').find('select[name="users"]')[0].selectedIndex = -1;
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+            }
+        });
+    })
 });
 
 function getMessages(roomId) {

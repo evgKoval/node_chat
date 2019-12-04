@@ -24,6 +24,23 @@ module.exports= class User {
         );
     }
 
+    static all() {
+        return new Promise((resolve, reject) => {
+            const sql = "SELECT u.id, u.email FROM users u";
+            connection.query(sql,
+                function(err, results) {
+                    if(err) reject(err);
+
+                    if(!results) {
+                        resolve(null);
+                    }
+
+                    resolve(results);
+                }
+            );
+        })
+    }
+
     static checkEmail(email, password) {
         return new Promise((resolve, reject) => {
             const sql = "SELECT * FROM users WHERE email = ? AND password = ?";

@@ -1,13 +1,27 @@
 const User = require("../models/user.js");
  
 exports.login = function (request, response) {
-    response.render('login.jade');
+    if(request.session.user_id) {
+        response.redirect('back');
+    } else {
+        response.render('login.jade');
+    }
 };
 
 exports.register = function(request, response) {
-    response.render('register.jade', {
-        user: request.session.user_id
-    });
+    if(request.session.user_id) {
+        response.redirect('back');
+    } else {
+        response.render('register.jade', {
+            user: request.session.user_id
+        });
+    }
+};
+
+exports.logout = function(request, response) {
+    request.session.user_id = null;
+
+    response.redirect('/login');
 };
 
 exports.store = function(request, response) {
