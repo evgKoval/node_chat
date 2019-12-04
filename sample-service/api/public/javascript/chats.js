@@ -47,13 +47,41 @@ $(document).ready(function() {
                     <div class="media text-right mb-3">\
                         <div class="media-body">\
                             <span class="d-block">' + email + '</span>\
-                            <strong>' + message + '</strong>\
-                            <br>\
-                            <small>recently</small>\
+                            <strong class="message-text">' + message + '</strong>\
+                            <small class="d-block">recently</small>\
                         </div>\
                         <img src="/images/avatar.png" class="ml-3" width="48" height="48">\
                     </div>\
                 ');
+
+                var newMessage = $('.messages .media:last').find('.message-text');
+                console.log(newMessage);
+
+                newMessage.on("dblclick", function () {
+                    newMessage.hide();
+
+                    newMessage.before('\
+                        <div class="input-group input-group-sm mt-2 mb-2">\
+                            <input type="text" value="' + newMessage.html() + '" class="form-control message-edit">\
+                        </div>\
+                    ');
+
+                    $('.message-edit').focus();
+
+                    $('.message-edit').focusout(function() {
+                        if(newMessage.html() != $(this).val()) {
+                            editMessage($this.data('id'), $(this).val());
+
+                            newMessage.html($(this).val());
+
+                            newMessage.append('<span class="badge badge-pill badge-light ml-1">edited</span>');
+                        }
+
+                        $(this).parent().remove();
+                        
+                        newMessage.show();
+                    });
+                });
 
                 $('input[name="message"]').val('');
                 $($this).removeAttr('disabled');
@@ -113,7 +141,7 @@ $(document).ready(function() {
                 console.log(textStatus, errorThrown);
             }
         });
-    })
+    });
 });
 
 function getMessages(roomId) {
@@ -130,9 +158,9 @@ function getMessages(roomId) {
                             <div class="media text-right mb-3">\
                                 <div class="media-body">\
                                     <span class="d-block">' + response.messages[i].email + '</span>\
-                                    <strong>' + response.messages[i].message_text + '</strong>\
-                                    <br>\
-                                    <small>' + response.messages[i].created_at + '</small>\
+                                    <strong class="message-text" data-id="' + response.messages[i].id + '">' + response.messages[i].message_text + '</strong>\
+                                    ' + editedMessage(response.messages[i].edited) + '\
+                                    <small class="d-block">' + response.messages[i].created_at + '</small>\
                                 </div>\
                                 <img src="/images/avatar.png" class="ml-3" width="48" height="48">\
                             </div>\
@@ -143,14 +171,44 @@ function getMessages(roomId) {
                                 <img src="/images/avatar.png" class="mr-3" width="48" height="48">\
                                 <div class="media-body">\
                                     <span class="d-block">' + response.messages[i].email + '</span>\
-                                    <strong>' + response.messages[i].message_text + '</strong>\
-                                    <br>\
-                                    <small>' + response.messages[i].created_at + '</small>\
+                                    <strong class="message-text" data-id="' + response.messages[i].id + '">' + response.messages[i].message_text + '</strong>\
+                                    ' + editedMessage(response.messages[i].edited) + '\
+                                    <small class="d-block">' + response.messages[i].created_at + '</small>\
                                 </div>\
                             </div>\
                         ');
                     }
                 }
+
+                $('.message-text').each(function() {
+                    var $this = $(this);
+
+                    $this.on("dblclick", function () {
+                        $this.hide();
+
+                        $this.before('\
+                            <div class="input-group input-group-sm mt-2 mb-2">\
+                                <input type="text" value="' + $this.html() + '" class="form-control message-edit">\
+                            </div>\
+                        ');
+
+                        $('.message-edit').focus();
+
+                        $('.message-edit').focusout(function() {
+                            if($(this).val() != $this.html()) {
+                                editMessage($this.data('id'), $(this).val());
+
+                                $this.html($(this).val());
+
+                                $this.append('<span class="badge badge-pill badge-light ml-1">edited</span>');
+                            }
+
+                            $(this).parent().remove();
+
+                            $this.show();
+                        });
+                    });
+                });
             } else {
                 $('.messages').append('<h6 class="text-center">There are no messages in this chat</h6>');
             }
@@ -160,4 +218,29 @@ function getMessages(roomId) {
             console.log(textStatus, errorThrown);
         }
     });
+}
+
+function editMessage(messageId, messageText) {
+    $.ajax({
+        type: "PUT",
+        url: '/api/chat/message',
+        data: {
+            'message_id': messageId,
+            'message_text': messageText
+        },
+        success: function (response) {
+            console.log(response);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus, errorThrown);
+        }
+    });
+}
+
+function editedMessage(edited) {
+    if(edited == 1) {
+        return '<span class="badge badge-pill badge-light ml-1">edited</span>';
+    } else {
+        return '';
+    }
 }

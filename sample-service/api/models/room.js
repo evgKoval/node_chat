@@ -63,7 +63,7 @@ module.exports = class Room {
 
     static getRoomMessages(userId, roomId) {
         return new Promise((resolve, reject) => {
-            const sql = 'SELECT m.created_at, m.message_text, u.email, IF(m.user_id = ?, "true", "false") AS own FROM messages m LEFT JOIN users u ON m.user_id = u.id WHERE m.room_id = ?';
+            const sql = 'SELECT m.id, m.created_at, m.message_text, m.edited, u.email, IF(m.user_id = ?, "true", "false") AS own FROM messages m LEFT JOIN users u ON m.user_id = u.id WHERE m.room_id = ?';
             connection.query(sql, [userId, roomId],
                 function(err, results) {
                     if(err) reject(err);
@@ -98,6 +98,21 @@ module.exports = class Room {
 
                     resolve(results);
                     //return results;
+                }
+            )
+        })
+    }
+
+    static editMessage(messageId, messageText) {
+        return new Promise((resolve, reject) => {
+            const sql = 'UPDATE messages SET message_text = ?, edited = 1 WHERE id = ?;';
+            const values = [messageText, messageId];
+            
+            connection.query(sql, values,
+                function(err, results) {
+                    if(err) reject(err);
+
+                    resolve(results);
                 }
             )
         })

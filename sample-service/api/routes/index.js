@@ -18,5 +18,6 @@ router.post('/logout', UserController.logout);
 router.get('/api/chat/:id', ChatController.show);
 router.post('/api/chat', ChatController.store);
 router.post('/api/chat/message', ChatController.message);
+router.put('/api/chat/message', ChatController.update);
 
 module.exports = router;

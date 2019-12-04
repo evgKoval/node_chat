@@ -35,3 +35,12 @@ exports.message = async function(request, response) {
         'message': await Room.sendMessage(userId, roomId, message)
     })
 }
+
+exports.update = async function(request, response) {
+    const messageId = request.body.message_id;
+    const messageText = request.body.message_text;
+
+    response.json({
+        'message': await Room.editMessage(messageId, messageText)
+    })
+}
