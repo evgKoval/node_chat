@@ -13,6 +13,8 @@ router.post('/login', UserController.logining);
 router.get('/register', UserController.register);
 router.post('/register', UserController.store);
 
+router.get('/profile/:id', UserController.edit);
+router.put('/profile/:id', UserController.update);
 router.post('/logout', UserController.logout);
 
 router.get('/api/chat/:id', ChatController.show);

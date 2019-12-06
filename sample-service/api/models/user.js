@@ -57,4 +57,36 @@ module.exports= class User {
             );
         })
     }
+
+    static getPersonalData(userId) {
+        return new Promise((resolve, reject) => {
+            const sql = "SELECT name, email, avatar FROM users WHERE id = ?";
+            connection.query(sql, userId,
+                function(err, results) {
+                    if(err) reject(err);
+
+                    if(!results) {
+                        resolve(null);
+                    }
+                    
+                    resolve(results[0]);
+                }
+            );
+        })
+    }
+
+    static updateProfile(userId, profileName, profileEmail, profileAvatar) {
+        return new Promise((resolve, reject) => {
+            const sql = "UPDATE users SET name = ?, email = ?, avatar = ? WHERE id = ?;";
+            const values = [profileName, profileEmail, profileAvatar, userId];
+
+            connection.query(sql, values,
+                function(err, results) {
+                    if(err) reject(err);
+                    
+                    resolve(results);
+                }
+            );
+        })
+    }
 }

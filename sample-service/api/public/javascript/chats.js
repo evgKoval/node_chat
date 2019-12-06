@@ -204,24 +204,24 @@ function getMessages(roomId) {
                         $('.messages').append('\
                             <div class="media text-right mb-3">\
                                 <div class="media-body">\
-                                    <span class="d-block">' + response.messages[i].email + '</span>\
+                                    <span class="d-block">' + response.messages[i].name + '</span>\
                                     <strong class="message-text" data-id="' + response.messages[i].id + '">' + response.messages[i].message_text + '</strong>\
                                     ' + editedMessage(response.messages[i].edited) + '\
                                     <small class="d-block" title="' + formatDate(response.messages[i].created_at) + '">' + formatPrettyDate(response.messages[i].created_at) + '</small>\
                                 </div>\
+                                <div style="' + getUserAvatar(response.messages[i].avatar) + '" class="user-avatar ml-3"></div>\
                             </div>\
                         ');
 
-                        // <img src="/images/avatar.png" class="ml-3" width="48" height="48">\
 
                     } else {
 
-                        // <img src="/images/avatar.png" class="mr-3" width="48" height="48">\
-
+                        
                         $('.messages').append('\
-                            <div class="media mb-3">\
+                        <div class="media mb-3">\
+                                <div style="' + getUserAvatar(response.messages[i].avatar) + '" class="user-avatar mr-3"></div>\
                                 <div class="media-body">\
-                                    <span class="d-block">' + response.messages[i].email + '</span>\
+                                    <span class="d-block">' + response.messages[i].name + '</span>\
                                     <strong class="message-text" data-id="' + response.messages[i].id + '">' + response.messages[i].message_text + '</strong>\
                                     ' + editedMessage(response.messages[i].edited) + '\
                                     <small class="d-block" title="' + formatDate(response.messages[i].created_at) + '">' + formatPrettyDate(response.messages[i].created_at) + '</small>\
@@ -319,7 +319,6 @@ function editedMessage(edited) {
 }
 
 function deleteMessage(messageId) {
-    console.log(messageId)
     $.ajax({
         type: "DELETE",
         url: '/api/chat/message',
@@ -340,5 +339,9 @@ function formatPrettyDate(date) {
 }
 
 function formatDate(date) {
-    return $.format.date(date, "At dd.MM.yyyy HH:mm")
+    return $.format.date(date, "At dd.MM.yyyy HH:mm");
+}
+
+function getUserAvatar(avatar) {
+    return 'background-image: url(../images/' + avatar + ')';
 }

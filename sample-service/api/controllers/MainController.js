@@ -8,8 +8,10 @@ exports.index = async function (request, response) {
         const email = request.session.email;
         const rooms =  await Room.ownRooms(userId);
         const users = await User.all();
+        const userData = await User.getPersonalData(userId);
 
         response.render('index.jade', {
+            userData: userData,
             user: email,
             userId: userId,
             users: users,

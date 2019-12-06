@@ -79,3 +79,26 @@ a {
 .media.text-right {
   align-self: flex-end;
 }
+
+.logout {
+  border-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.avatar {
+  border-radius: 50%;
+  width: 192px;
+  height: 192px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.user-avatar {
+  width: 57.2px;
+  height: 57.2px;
+  background-position: center;
+  background-size: cover;
+  border-radius: 50%;
+}

@@ -14,10 +14,11 @@ html
       div.navbar-nav
         div.btn-group
           if userId
+            a.btn.btn-outline-primary.nav-link(href='/profile/' + userId) Profile
             form(method='POST', action='/logout')
-              button.btn.btn-outline-primary(type='submit') Logout
+              button.btn.btn-outline-primary.nav-link.logout(type='submit') Logout
           else
             a.btn.btn-outline-primary.nav-link(href='/login') Login
-            a.btn.btn-outline-primary.nav-link(href='/register') Register   
+            a.btn.btn-outline-primary.nav-link(href='/register/') Register
     div.container
       block content
