@@ -44,3 +44,11 @@ exports.update = async function(request, response) {
         'message': await Room.editMessage(messageId, messageText)
     })
 }
+
+exports.destroy = async function(request, response) {
+    const messageId = request.body.message_id;
+
+    response.json({
+        'message': await Room.deleteMessage(messageId)
+    })
+}

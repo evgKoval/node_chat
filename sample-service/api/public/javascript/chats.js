@@ -1,6 +1,6 @@
 $(document).ready(function() {
     $('.room-item').first().addClass('active');
-    getMessages($('.room-item').first().data('id'))
+    getMessages($('.room-item').first().data('id'));
 
     $('form').find('input[name="room"]').val($('.room-item').first().data('id'));
 
@@ -8,6 +8,7 @@ $(document).ready(function() {
         var $this = $(this);
 
         $this.on("click", function () {
+            $('.input-search').find('input[name="search"]').val('');
             $('input[name="message"]').removeClass('is-invalid');
             $('.room-item').removeClass('active');
 
@@ -47,39 +48,60 @@ $(document).ready(function() {
                     <div class="media text-right mb-3">\
                         <div class="media-body">\
                             <span class="d-block">' + email + '</span>\
-                            <strong class="message-text">' + message + '</strong>\
-                            <small class="d-block">recently</small>\
+                            <strong class="message-text" data-id="' + response.message.insertId + '">' + message + '</strong>\
+                            <small class="d-block">just now</small>\
                         </div>\
-                        <img src="/images/avatar.png" class="ml-3" width="48" height="48">\
                     </div>\
                 ');
+
+                var d = $('.messages');
+                d.scrollTop(d.prop("scrollHeight"));
+
+                // <img src="/images/avatar.png" class="ml-3" width="48" height="48">\
 
                 var newMessage = $('.messages .media:last').find('.message-text');
                 console.log(newMessage);
 
-                newMessage.on("dblclick", function () {
+                newMessage.on("dblclick", function () {                    
                     newMessage.hide();
 
                     newMessage.before('\
                         <div class="input-group input-group-sm mt-2 mb-2">\
                             <input type="text" value="' + newMessage.html() + '" class="form-control message-edit">\
+                            <div class="input-group-append">\
+                                <button class="btn btn-danger message-delete" type="button">Delete</button>\
+                            </div>\
                         </div>\
                     ');
 
+                    var media = newMessage.parent().parent();
+                    media.addClass('w-100');
+
                     $('.message-edit').focus();
 
+                    $('.message-delete').click(function() {
+                        console.log(newMessage)
+                        deleteMessage(newMessage.data('id'));
+
+                        newMessage.parent().parent().remove();
+                    })
+
                     $('.message-edit').focusout(function() {
-                        if(newMessage.html() != $(this).val()) {
-                            editMessage($this.data('id'), $(this).val());
-
-                            newMessage.html($(this).val());
-
-                            newMessage.append('<span class="badge badge-pill badge-light ml-1">edited</span>');
-                        }
-
-                        $(this).parent().remove();
-                        
-                        newMessage.show();
+                        window.setTimeout(() => {
+                            if(newMessage.html() != $(this).val()) {
+                                editMessage($this.data('id'), $(this).val());
+    
+                                newMessage.html($(this).val());
+    
+                                newMessage.append('<span class="badge badge-pill badge-light ml-1">edited</span>');
+                            }
+    
+                            media.removeClass('w-100');
+    
+                            $(this).parent().remove();
+                            
+                            newMessage.show();
+                        }, 100)
                     });
                 });
 
@@ -142,6 +164,31 @@ $(document).ready(function() {
             }
         });
     });
+
+    $('.input-search input').on('focusout', function() {
+        var search = $('.input-search').find('input[name="search"]').val();
+
+        var messages = $('.messages .media');
+
+        for(var i = 0; i < messages.length; i++) {
+            $(messages[i]).show();
+        }
+
+        var count = 0;
+
+        for(var i = 0; i < messages.length; i++) {
+            if(!$(messages[i]).find('strong').html().includes(search)) {
+                $(messages[i]).hide();
+                count++;
+            }
+        }
+
+        if($('.messages .media').length == count && search != '') {
+            $('.messages').append('<h6 class="text-center">There are no messages by this message</h6>');
+        } else {
+            $('.messages h6').hide();
+        }
+    });
 });
 
 function getMessages(roomId) {
@@ -160,20 +207,24 @@ function getMessages(roomId) {
                                     <span class="d-block">' + response.messages[i].email + '</span>\
                                     <strong class="message-text" data-id="' + response.messages[i].id + '">' + response.messages[i].message_text + '</strong>\
                                     ' + editedMessage(response.messages[i].edited) + '\
-                                    <small class="d-block">' + response.messages[i].created_at + '</small>\
+                                    <small class="d-block" title="' + formatDate(response.messages[i].created_at) + '">' + formatPrettyDate(response.messages[i].created_at) + '</small>\
                                 </div>\
-                                <img src="/images/avatar.png" class="ml-3" width="48" height="48">\
                             </div>\
                         ');
+
+                        // <img src="/images/avatar.png" class="ml-3" width="48" height="48">\
+
                     } else {
+
+                        // <img src="/images/avatar.png" class="mr-3" width="48" height="48">\
+
                         $('.messages').append('\
                             <div class="media mb-3">\
-                                <img src="/images/avatar.png" class="mr-3" width="48" height="48">\
                                 <div class="media-body">\
                                     <span class="d-block">' + response.messages[i].email + '</span>\
                                     <strong class="message-text" data-id="' + response.messages[i].id + '">' + response.messages[i].message_text + '</strong>\
                                     ' + editedMessage(response.messages[i].edited) + '\
-                                    <small class="d-block">' + response.messages[i].created_at + '</small>\
+                                    <small class="d-block" title="' + formatDate(response.messages[i].created_at) + '">' + formatPrettyDate(response.messages[i].created_at) + '</small>\
                                 </div>\
                             </div>\
                         ');
@@ -184,28 +235,48 @@ function getMessages(roomId) {
                     var $this = $(this);
 
                     $this.on("dblclick", function () {
+                        if(!$this.parent().parent().hasClass('text-right')) {
+                            return;
+                        }
+
                         $this.hide();
 
                         $this.before('\
                             <div class="input-group input-group-sm mt-2 mb-2">\
                                 <input type="text" value="' + $this.html() + '" class="form-control message-edit">\
+                                <div class="input-group-append">\
+                                    <button class="btn btn-danger message-delete" type="button">Delete</button>\
+                                </div>\
                             </div>\
                         ');
 
+                        var media = $this.parent().parent();
+                        media.addClass('w-100');
+
                         $('.message-edit').focus();
 
+                        $('.message-delete').click(function() {
+                            deleteMessage($this.data('id'));
+
+                            $this.parent().parent().remove();
+                        })
+
                         $('.message-edit').focusout(function() {
-                            if($(this).val() != $this.html()) {
-                                editMessage($this.data('id'), $(this).val());
-
-                                $this.html($(this).val());
-
-                                $this.append('<span class="badge badge-pill badge-light ml-1">edited</span>');
-                            }
-
-                            $(this).parent().remove();
-
-                            $this.show();
+                            window.setTimeout(() => {
+                                if($(this).val() != $this.html()) {
+                                    editMessage($this.data('id'), $(this).val());
+    
+                                    $this.html($(this).val());
+    
+                                    $this.append('<span class="badge badge-pill badge-light ml-1">edited</span>');
+                                }
+    
+                                media.removeClass('w-100');
+    
+                                $(this).parent().remove();
+    
+                                $this.show();
+                            }, 100);
                         });
                     });
                 });
@@ -213,6 +284,8 @@ function getMessages(roomId) {
                 $('.messages').append('<h6 class="text-center">There are no messages in this chat</h6>');
             }
             
+            var d = $('.messages');
+            d.scrollTop(d.prop("scrollHeight"));
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.log(textStatus, errorThrown);
@@ -243,4 +316,29 @@ function editedMessage(edited) {
     } else {
         return '';
     }
+}
+
+function deleteMessage(messageId) {
+    console.log(messageId)
+    $.ajax({
+        type: "DELETE",
+        url: '/api/chat/message',
+        data: {
+            'message_id': messageId
+        },
+        success: function (response) {
+            console.log(response);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus, errorThrown);
+        }
+    });
+}
+
+function formatPrettyDate(date) {
+    return $.format.prettyDate(date);
+}
+
+function formatDate(date) {
+    return $.format.date(date, "At dd.MM.yyyy HH:mm")
 }

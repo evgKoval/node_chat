@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  div.mt-4.mb-3
+  div.mt-3.mb-3
     span Welcome, 
     strong.user-email= user
   div.card.mb-5
@@ -11,9 +11,13 @@ block content
           ul.list-group.list-group-flush.list-rooms
             each room in rooms
               li.list-group-item.room-item(data-id=room.id)= room.name
-            li.list-group-item 
+            li.list-group-item
               a.room-create(href='#', data-toggle='modal', data-target='#modal-create') Create a new room
         div.col-9
+          div.input-group.input-group-lg.input-search
+            input.form-control(type='text', placeholder='Search by message', name='search')
+            div.input-group-append
+              button.btn.btn-primary.btn-search(type='submit') Search
           div.messages
           form(method='POST', action='/api/chat/message')
             div.input-group.input-send
@@ -44,4 +48,5 @@ block content
           button.btn.btn-primary.btn-create(type='button') Create
 
   script
+    include ../public/javascript/jquery-date-format.js
     include ../public/javascript/chats.js

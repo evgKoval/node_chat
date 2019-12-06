@@ -2,6 +2,10 @@ a {
   color: #00B7FF;
 }
 
+.card {
+  height: 587px;
+}
+
 .card-body {
   padding: 0;
 }
@@ -10,29 +14,43 @@ a {
   width: 112%;
 }
 
-.input-send .form-control {
+.input-send .form-control, .input-search .form-control {
   border-radius: 0;
 }
 
+.btn-search {
+  border-bottom-right-radius: 0 !important;
+}
+
+.btn-send {
+  border-top-right-radius: 0;
+}
+
 .messages {
-  min-height: 480px;
+  height: 500px;
+  overflow: hidden;
+  overflow-y: scroll;
   position: relative;
   z-index: 1;
   padding: 1rem;
+  background: rgba(0, 0, 0, 0.5) url('../images/bg.jpg') no-repeat;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
 }
 
-.messages::before {
+/* .messages::before {
   content: "";
   position: absolute;
   top: 0; 
   left: 0;
-  width: 100%; 
-  height: 100%;  
+  width: 100vw; 
+  height: 100vh;  
   opacity: .2; 
   z-index: -1;
   background: rgba(0, 0, 0, 0.5) url('../images/bg.jpg') no-repeat;
   background-size: cover;
-}
+} */
 
 .room-item {
   cursor: pointer;
@@ -45,4 +63,19 @@ a {
 
 .badge {
   opacity: .4;
+}
+
+.media {
+  background-color: #fff;
+  padding: 10px 20px;
+  border-radius: 15px;
+  align-self: start;
+}
+
+.media:last-child {
+  margin-bottom: 0 !important;
+}
+
+.media.text-right {
+  align-self: flex-end;
 }
