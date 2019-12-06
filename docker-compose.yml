@@ -12,3 +12,7 @@ services:
      - ./sample-service/api:/app/api
   db:
     build: ./database-service
+  mongo:
+    image: 'mongo'
+    ports:
+      - "27017:27017"

@@ -11,7 +11,8 @@ DataBaseHandler.prototype.createConnection = function () {
         user: 'homestead',
         password: 'secret',
         database: 'nodeapp',
-	    port: 3306
+        port: 3306,
+        charset: 'utf8mb4'
     });
 
     this.connection.connect(function (err) {
