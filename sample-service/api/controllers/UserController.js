@@ -18,6 +18,38 @@ exports.register = function(request, response) {
     }
 };
 
+exports.edit = async function(request, response) {
+    const userId = request.session.user_id;
+    if(!userId) {
+        response.redirect('back');
+    } else {
+
+        response.render('profile.jade', {
+            'userId': userId,
+            'userData': await User.getPersonalData(userId)
+        });
+    }
+}
+
+exports.update = async function(request, response) {
+    const userId = request.session.user_id;
+
+    const filedata = request.files.avatar;
+    filedata.name = userId + '_' + filedata.name;
+
+    const path = __dirname + '/../public/images/' + filedata.name
+    
+    request.files.avatar.mv(path);
+
+    const profileName = request.body.name;
+    const profileEmail = request.body.email;
+    const profileAvatar = request.body.avatar_name;
+
+    response.json({
+        'profile': await User.updateProfile(userId, profileName, profileEmail, profileAvatar)
+    })
+}
+
 exports.logout = function(request, response) {
     request.session.user_id = null;
 

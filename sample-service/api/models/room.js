@@ -50,7 +50,7 @@ module.exports = class Room {
 
     static getRoomMessages(userId, roomId) {
         return new Promise((resolve, reject) => {
-            const sql = 'SELECT m.id, m.created_at, m.message_text, m.edited, u.email, IF(m.user_id = ?, "true", "false") AS own FROM messages m LEFT JOIN users u ON m.user_id = u.id WHERE m.room_id = ?';
+            const sql = 'SELECT m.id, m.created_at, m.message_text, m.edited, u.email, u.name, u.avatar, IF(m.user_id = ?, "true", "false") AS own FROM messages m LEFT JOIN users u ON m.user_id = u.id WHERE m.room_id = ? ORDER BY m.created_at';
             connection.query(sql, [userId, roomId],
                 function(err, results) {
                     if(err) reject(err);
@@ -68,7 +68,6 @@ module.exports = class Room {
             const dbo = connectionMongo.db("myapp");
             dbo.collection("messages").find({}).toArray(function(err, result) {
                 if (err) throw err;
-                console.log('result', result);
             });
         })
     }
@@ -105,7 +104,6 @@ module.exports = class Room {
             const dbo = connectionMongo.db("myapp");
             dbo.collection("messages").insertOne(data, function(err, res) {
                 if (err) throw err;
-                console.log("1 document inserted", res);
             });
         })
     }

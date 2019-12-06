@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  h1.mb-4 Your profile
+  div.row
+    div.col-4
+        div.avatar(style=`background-image: url('/images/` + userData.avatar + `')`)
+        form.mt-4.mb-4
+            div.custom-file
+                input#avatar.custom-file-input(type='file')
+                label.custom-file-label(for='avatar') Change your avatar
+  form.mb-4
+    div.form-group
+        label(for='name') Name:
+        input#name.form-control(type='text', placeholder='Enter your name', value=userData.name name='name')
+    div.form-group
+        label(for='email') Email:
+        input#email.form-control(type='text', placeholder='example@email.com', value=userData.email name='email')
+    button.btn.btn-primary.btn-block.edit-profile Edit
+
+    script
+        include ../public/javascript/profile.js
