@@ -229,4 +229,21 @@ module.exports = class Room {
             resolve(result);
         })
     }
+
+    static accessUserInRoom(roomId, userId) {
+        return new Promise((resolve, reject) => {
+            const sql = 'INSERT INTO chat_users (room_id, user_id) VALUES ?';
+            const values = [
+                [roomId, userId]
+            ];
+
+            connection.query(sql, [values],
+                function(err, results) {
+                    if(err) reject(err);
+
+                    resolve(results);
+                }
+            )
+        })
+    }
 }

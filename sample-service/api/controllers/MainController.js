@@ -45,7 +45,7 @@ exports.access = async function(request, response) {
         from: process.env.NODEMAILER_USER,
         to: roomCreator.email,
         subject: 'Someone has wanted to join in your chat!',
-        text: `${userName} (${userEmail}) just asked to join in your chat (${roomName}). To access this ${userName} click this link <a href="http://192.168.99.101:8123/access/${roomId}/${userId}">http://192.168.99.101:8123/access/${roomId}/${userId}</>`
+        text: `${userName} (${userEmail}) just asked to join in your chat (${roomName}). To access ${userName} click this link http://192.168.99.101:8123/access/${roomId}/${userId}`
     };
       
     transporter.sendMail(mailOptions, function(error, info){
@@ -56,5 +56,23 @@ exports.access = async function(request, response) {
                 'email': 'Success'
             });
         }
+    });
+}
+
+exports.confirm = async function(request, response) {
+    const roomId = request.params.roomId;
+    const userId = request.params.userId;
+
+    const access = await Room.accessUserInRoom(roomId, userId);
+
+    console.log(access);
+    if(access.length == 0) {
+        response.json({ 
+            'access': 'User isn\'t accessed to chat'
+        });
+    }
+
+    response.json({ 
+        'access': 'User has accessed to chat'
     });
 }
