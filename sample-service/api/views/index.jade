@@ -3,7 +3,8 @@ extends layout
 block content
   div.mt-3.mb-3
     span Welcome, 
-    strong.user-email= userData.name
+    strong.user-name= userData.name
+    span.user-email.d-none= userData.email
   div.card.mb-5
     div.card-body
       div.row

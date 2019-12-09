@@ -3,9 +3,16 @@ const Room = require("../models/room.js");
 exports.show = async function (request, response) {
     const userId = request.session.user_id;
     const roomId = request.params.id;
+    let messages = null;
+
+    const access = await Room.getAccess(roomId, userId);
+
+    if(access) {
+        messages = await Room.getRoomMessages(userId, roomId);
+    }
 
     response.json({ 
-        'messages': await Room.getRoomMessages(userId, roomId)
+        'messages': messages
     });
 };
 

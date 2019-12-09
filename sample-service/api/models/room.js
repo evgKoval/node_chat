@@ -62,6 +62,38 @@ module.exports = class Room {
         })
     }
 
+    static getAccess(roomId, userId) {
+        return new Promise((resolve, reject) => {
+            const sql = 'SELECT * FROM chat_users WHERE room_id = ? AND user_id = ?';
+
+            connection.query(sql, [roomId, userId],
+                function(err, results) {
+                    if(err) reject(err);
+
+                    if(results.length == 0) {
+                        resolve(false);
+                    }
+
+                    resolve(true);
+                }
+            );
+        })
+    }
+
+    static getCreatorByRoomId(roomId) {
+        return new Promise((resolve, reject) => {
+            const sql = 'SELECT u.email FROM rooms r LEFT JOIN users u ON u.id = r.created_by WHERE r.id = ?';
+
+            connection.query(sql, roomId,
+                function(err, results) {
+                    if(err) reject(err);
+
+                    resolve(results[0]);
+                }
+            );
+        })
+    }
+
     static getRoomMessages(userId, roomId) {
         return new Promise((resolve, reject) => {
             const sql = 'SELECT m.id, m.created_at, m.message_text, m.edited, u.email, u.name, u.avatar, IF(m.user_id = ?, "true", "false") AS own FROM messages m LEFT JOIN users u ON m.user_id = u.id WHERE m.room_id = ? ORDER BY m.created_at';
@@ -71,11 +103,9 @@ module.exports = class Room {
 
                     if(!results) {
                         resolve(null);
-                        //return null;
                     }
 
                     resolve(results);
-                    //return results;
                 }
             );
 
