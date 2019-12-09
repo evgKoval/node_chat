@@ -4,7 +4,8 @@ block content
   h1.mb-4 Your profile
   div.row
     div.col-4
-        div.avatar(style=`background-image: url('/images/` + userData.avatar + `')`)
+        // div.avatar(style=`background-image: url('/images/` + userData.avatar + `')`)
+        div.avatar(style=`background-image: url('https://nodejschat.s3.eu-central-1.amazonaws.com/` + userData.avatar + `')`)
         form.mt-4.mb-4
             div.custom-file
                 input#avatar.custom-file-input(type='file')

@@ -8,6 +8,7 @@ const RoomController = require('../controllers/RoomController');
 
 router.get('/', MainController.index);
 router.post('/send-access', MainController.access);
+router.get('/access/:roomId/:userId', MainController.confirm);
 
 router.get('/login', UserController.login);
 router.post('/login', UserController.logining);
