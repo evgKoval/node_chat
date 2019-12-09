@@ -25,7 +25,8 @@ exports.index = async function (request, response) {
 };
 
 exports.access = async function(request, response) {
-    const roomCreator = await Room.getCreatorByRoomId(request.body.room_id);
+    const roomId = request.body.room_id;
+    const roomCreator = await Room.getCreatorByRoomId(roomId);
 
     const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -35,6 +36,7 @@ exports.access = async function(request, response) {
         }
     });
 
+    const userId = request.body.user_id;
     const userName = request.body.user_name;
     const userEmail = request.body.user_email;
     const roomName = request.body.room_name;
@@ -43,7 +45,7 @@ exports.access = async function(request, response) {
         from: process.env.NODEMAILER_USER,
         to: roomCreator.email,
         subject: 'Someone has wanted to join in your chat!',
-        text: `${userName} (${userEmail}) just asked to join in your chat (${roomName})`
+        text: `${userName} (${userEmail}) just asked to join in your chat (${roomName}). To access this ${userName} click this link <a href="http://192.168.99.101:8123/access/${roomId}/${userId}">http://192.168.99.101:8123/access/${roomId}/${userId}</>`
     };
       
     transporter.sendMail(mailOptions, function(error, info){

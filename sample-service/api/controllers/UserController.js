@@ -1,3 +1,9 @@
+const AWS = require('aws-sdk');
+const s3 = new AWS.S3({
+    accessKeyId: process.env.ACCESS_KEY,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY
+});
+
 const User = require("../models/user.js");
  
 exports.login = function (request, response) {
@@ -36,10 +42,26 @@ exports.update = async function(request, response) {
 
     const filedata = request.files.avatar;
     filedata.name = userId + '_' + filedata.name;
-
-    const path = __dirname + '/../public/images/' + filedata.name
     
-    request.files.avatar.mv(path);
+    var base64data = Buffer.from(filedata.data, 'binary');
+
+    const params = {
+        Bucket: process.env.BUCKET_NAME,
+        Key: filedata.name,
+        Body: base64data,
+        ACL: 'public-read'
+    };
+
+    s3.upload(params, function(err, data) {
+        if (err) {
+            throw err;
+        }
+        console.log(`File uploaded successfully. ${data.Location}`);
+    });
+
+    // const path = __dirname + '/../public/images/' + filedata.name
+    
+    // request.files.avatar.mv(path);
 
     const profileName = request.body.name;
     const profileEmail = request.body.email;
