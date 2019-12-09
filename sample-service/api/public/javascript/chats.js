@@ -299,6 +299,7 @@ function getMessages(roomId) {
 
                     var userName = $('.user-name').html();
                     var userEmail = $('.user-email').html();
+                    var userId = $('.user-id').html();
                     var roomName = $('.room-item.active').find('span').html();
 
                     $.ajax({
@@ -308,6 +309,7 @@ function getMessages(roomId) {
                             'room_id': roomId,
                             'user_name': userName,
                             'user_email': userEmail,
+                            'user_id': userId,
                             'room_name': roomName,
                         },
                         success: function (response) {
