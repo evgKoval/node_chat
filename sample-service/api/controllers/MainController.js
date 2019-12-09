@@ -6,7 +6,7 @@ exports.index = async function (request, response) {
 
     if(userId) {
         const email = request.session.email;
-        const rooms =  await Room.ownRooms(userId);
+        const rooms =  await Room.all();
         const users = await User.all();
         const userData = await User.getPersonalData(userId);
 

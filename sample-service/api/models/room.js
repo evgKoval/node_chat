@@ -13,17 +13,16 @@ mongoDB.createConnection().then(res => {
 module.exports = class Room {
     static all() {
         return new Promise((resolve, reject) => {
-            const sql = "SELECT name FROM rooms";
+            const sql = "SELECT * FROM rooms";
             connection.query(sql,
                 function(err, results) {
-                    if(err) throw err;
+                    if(err) reject(err);
 
                     if(!results) {
-                        return null;
+                        resolve(null);
                     }
 
                     resolve(results);
-                    return results
                 }
             )
         });
@@ -31,21 +30,36 @@ module.exports = class Room {
 
     static ownRooms(userId) {
         return new Promise((resolve, reject) => {
-            const sql = "SELECT r.id, r.name FROM rooms r LEFT JOIN chat_users c ON c.room_id = r.id WHERE c.user_id = ?";
-            connection.query(sql, [userId],
+            const sql = "SELECT r.id, r.name, r.created_by FROM rooms r LEFT JOIN chat_users c ON c.room_id = r.id";
+            connection.query(sql,
                 function(err, results) {
                     if(err) reject(err);
 
                     if(!results) {
                         resolve(null);
-                        //return null;
                     }
 
                     resolve(results);
-                    //return results;
                 }
             )
         });
+    }
+
+    static getRoomById(roomId) {
+        return new Promise((resolve, reject) => {
+            const sql = "SELECT r.name, c.user_id FROM rooms r LEFT JOIN chat_users c ON r.id = c.room_id WHERE r.id = ?";
+            connection.query(sql, roomId,
+                function(err, results) {
+                    if(err) reject(err);
+
+                    if(!results) {
+                        resolve(null);
+                    }
+
+                    resolve(results);
+                }
+            );
+        })
     }
 
     static getRoomMessages(userId, roomId) {

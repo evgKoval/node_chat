@@ -29,7 +29,7 @@ a {
 .messages {
   height: 500px;
   overflow: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
   position: relative;
   z-index: 1;
   padding: 1rem;
@@ -101,4 +101,46 @@ a {
   background-position: center;
   background-size: cover;
   border-radius: 50%;
+}
+
+.modal .list-group {
+  width: 100%;
+}
+
+.edit-room {
+  position: absolute;
+  font-size: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 20px;
+  color: grey;
+  transition: .15s;
+}
+
+.active .edit-room {
+  color: #fff;
+}
+
+.edit-room:hover {
+  color: #000;
+}
+
+.list-rooms {
+  overflow: hidden;
+  overflow-y: auto;
+  height: 548px;
+}
+
+.left-bar .input-group {
+  width: 112%;
+}
+
+.left-bar .input-group input {
+  border-bottom-left-radius: 0.25rem;
+}
+
+.left-bar .input-group .btn-search {
+  border-top-right-radius: 0;
+  position: relative;
+  left: -1px;
 }

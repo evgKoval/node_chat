@@ -7,13 +7,23 @@ block content
   div.card.mb-5
     div.card-body
       div.row
-        div.col-3
+        div.col-3.left-bar
           ul.list-group.list-group-flush.list-rooms
-            each room in rooms
-              li.list-group-item.room-item(data-id=room.id)= room.name
-            li.list-group-item
+            li.list-group-item.room-item-create
               a.room-create(href='#', data-toggle='modal', data-target='#modal-create') Create a new room
-        div.col-9
+            each room in rooms
+              if room.created_by == userId
+                li.list-group-item.room-item.own-room(data-id=room.id)
+                  span= room.name
+                  i.edit-room.far.fa-edit
+              else
+                li.list-group-item.room-item(data-id=room.id)
+                  span= room.name
+          div.input-group.input-search
+            input.form-control(type='text', placeholder='Search by chat', name='search')
+            div.input-group-append
+              button.btn.btn-primary.btn-search(type='submit') Search
+        div.col-9.main-bar
           div.input-group.input-group-lg.input-search
             input.form-control(type='text', placeholder='Search by message', name='search')
             div.input-group-append
@@ -38,7 +48,15 @@ block content
             div.input-group.input-chat-name.mb-3
               input.form-control(type='text', placeholder='Room name', name='name')
             p Join users into the room
-            select.custom-select(multiple, name='users')
+            ul.list-group
+              each form_user in users
+                if form_user.email == user
+                  - continue
+                li.list-group-item
+                  div.custom-control.custom-switch
+                    input(type='checkbox', name='users', value= form_user.id, id='create_' + form_user.id).custom-control-input
+                    label(for='create_' + form_user.id).custom-control-label= form_user.email
+            //select.custom-select(multiple, name='users')
               each form_user in users
                 if form_user.email == user
                   - continue
@@ -46,6 +64,35 @@ block content
         div.modal-footer
           button.btn.btn-secondary(type='button', data-dismiss='modal') Close
           button.btn.btn-primary.btn-create(type='button') Create
+
+  div#modal-edit.modal.fade(tabindex='-1', role='dialog')
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          h5.modal-title Edit this room
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') &times;
+        div.modal-body
+          form(method='PUT', action='/api/chat')
+            div.input-group.input-chat-name.mb-3
+              input.form-control(type='text', placeholder='Room name', name='name')
+            p Users in this room
+            ul.list-group
+              each form_user in users
+                if form_user.email == user
+                  - continue
+                li.list-group-item
+                  div.custom-control.custom-switch
+                    input(type='checkbox', name='users', value= form_user.id, id='edit_' + form_user.id).custom-control-input
+                    label(for='edit_' + form_user.id).custom-control-label= form_user.email
+            //select.custom-select(multiple, name='users')
+              each form_user in users
+                if form_user.email == user
+                  - continue
+                option(value=form_user.id)= form_user.email
+        div.modal-footer
+          button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+          button.btn.btn-primary.btn-room-edit(type='button') Save
 
   script
     include ../public/javascript/jquery-date-format.js
