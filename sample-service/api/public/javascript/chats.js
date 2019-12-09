@@ -287,6 +287,43 @@ function getMessages(roomId) {
         success: function (response) {
             $('.messages').empty();
 
+            if(response.messages == null) {
+                $('.messages').append('<h6 class="text-center">\
+                    You have no access to see messages\
+                    <br>\
+                    <a href="#" class="send-access">Request an access</a>\
+                </h6>');
+
+                $('.send-access').on('click', function(e) {
+                    e.preventDefault();
+
+                    var userName = $('.user-name').html();
+                    var userEmail = $('.user-email').html();
+                    var roomName = $('.room-item.active').find('span').html();
+
+                    $.ajax({
+                        type: "POST",
+                        url: '/send-access',
+                        data: {
+                            'room_id': roomId,
+                            'user_name': userName,
+                            'user_email': userEmail,
+                            'room_name': roomName,
+                        },
+                        success: function (response) {
+                            $('.messages').append('<h6 class="text-center">\
+                                Message successfully received\
+                            </h6>');
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.log(textStatus, errorThrown);
+                        }
+                    });
+                })
+
+                return;
+            }
+
             // <span class="d-block">' + response.messages[i].name + '</span>\
 
             if(response.messages.length > 0) {

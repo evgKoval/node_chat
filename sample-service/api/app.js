@@ -1,4 +1,5 @@
 const express = require("express");
+const env = require('env2')(__dirname + '/.env');
 const bodyParser = require('body-parser');
 const router = require('./routes');
 const fileupload = require('express-fileupload');

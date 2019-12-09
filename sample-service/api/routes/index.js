@@ -7,6 +7,7 @@ const ChatController = require('../controllers/ChatController');
 const RoomController = require('../controllers/RoomController');
 
 router.get('/', MainController.index);
+router.post('/send-access', MainController.access);
 
 router.get('/login', UserController.login);
 router.post('/login', UserController.logining);
