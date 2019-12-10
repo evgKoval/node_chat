@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+    title ChatJS
+    link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css')
+    link(href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css", rel="stylesheet")
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(src='https://code.jquery.com/jquery-3.4.1.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js')
+    script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js')
+    script(src='/javascript/index.js')
+  body
+    nav.navbar.navbar-expand-lg
+      a.navbar-brand.mr-auto(href='/') ChatJS
+      div.navbar-nav
+        div.btn-group
+          if userId
+            a.btn.btn-outline-primary.nav-link(href='/profile/' + userId) Profile
+            form(method='POST', action='/logout')
+              button.btn.btn-outline-primary.nav-link.logout(type='submit') Logout
+          else
+            a.btn.btn-outline-primary.nav-link(href='/login') Login
+            a.btn.btn-outline-primary.nav-link(href='/register/') Register
+    div.container
+      block content
