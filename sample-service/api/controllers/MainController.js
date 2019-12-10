@@ -65,7 +65,6 @@ exports.confirm = async function(request, response) {
 
     const access = await Room.accessUserInRoom(roomId, userId);
 
-    console.log(access);
     if(access.length == 0) {
         response.json({ 
             'access': 'User isn\'t accessed to chat'

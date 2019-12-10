@@ -1,4 +1,14 @@
 $(document).ready(function() {
+    var d = new Date,
+    dformat = [(d.getMonth()+1).padLeft(),
+                d.getDate().padLeft(),
+                d.getFullYear()].join('-') +'_' +
+               [d.getHours().padLeft(),
+                d.getMinutes().padLeft(),
+                d.getSeconds().padLeft(),
+                d.getMilliseconds().padLeft()
+                ].join('-');
+
     $('.room-item').first().addClass('active');
     getMessages($('.room-item').first().data('id'));
 
@@ -44,16 +54,19 @@ $(document).ready(function() {
             success: function(response) {
                 var name = $('.user-email').html();
                 
+                response.message.own = 'true';
+                getMessageByType(response.message.message_type, response.message);
+
                 // <span class="d-block">' + name + '</span>\
 
-                $('.messages').append('\
-                    <div class="media text-right mb-3">\
-                        <div class="media-body">\
-                            <strong class="message-text" data-id="' + response.message.insertId + '">' + message + '</strong>\
-                            <small class="d-block">just now</small>\
-                        </div>\
-                    </div>\
-                ');
+                // $('.messages').append('\
+                //     <div class="media text-right mb-3">\
+                //         <div class="media-body">\
+                //             <strong class="message-text" data-id="' + response.message.insertId + '">' + message + '</strong>\
+                //             <small class="d-block">just now</small>\
+                //         </div>\
+                //     </div>\
+                // ');
                         
                 // <div style="' + getUserAvatar(response.messages[i].avatar) + '" class="user-avatar ml-3"></div>\
 
@@ -62,8 +75,7 @@ $(document).ready(function() {
 
                 // <img src="/images/avatar.png" class="ml-3" width="48" height="48">\
 
-                var newMessage = $('.messages .media:last').find('.message-text');
-                console.log(newMessage);
+                var newMessage = $('.messages .media:last').find('.message-text.type-text');
 
                 newMessage.on("dblclick", function () {                    
                     newMessage.hide();
@@ -83,7 +95,6 @@ $(document).ready(function() {
                     $('.message-edit').focus();
 
                     $('.message-delete').click(function() {
-                        console.log(newMessage)
                         deleteMessage(newMessage.data('id'));
 
                         newMessage.parent().parent().remove();
@@ -278,6 +289,57 @@ $(document).ready(function() {
             $('.left-bar h6').hide();
         }
     });
+
+    var file = null;
+    var $inputFile = $('input[name="chat_file"]');
+
+    $('.put-files').on('click', function(e) {
+        $inputFile.click();
+    });
+
+    $inputFile.on('change', function(e) {
+        var roomId = $('.room-item.active').data('id');
+
+        file = this.files;
+
+        var fileSize = file[0].size / 1024 / 1024;
+        if(fileSize > 50) {
+            console.log('File is too big!')
+            return;
+        }
+
+        handleFileSelect(file);
+
+        form = new FormData();
+
+        form.set('message_file', file[0]);
+        form.set('message_type', file[0].type);
+        form.set('room_id', roomId);
+        form.set('time', dformat);
+
+        $.ajax({
+            type: "POST",
+            url: '/api/chat/file',
+            data: form,
+            processData: false,
+            contentType: false,
+            // contentType: 'multipart/form-data',
+            success: function (response) {
+                setTimeout(() => {
+                    response.message.own = 'true';
+                    getMessageByType(response.message.message_type, response.message);
+
+                    setTimeout(() => {
+                        var d = $('.messages');
+                        d.scrollTop(d.prop("scrollHeight"));
+                    }, 250)
+                }, 1000);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+            }
+        });
+    });
 });
 
 function getMessages(roomId) {
@@ -330,37 +392,10 @@ function getMessages(roomId) {
 
             if(response.messages.length > 0) {
                 for(var i = 0; i < response.messages.length; i++) {
-                    if(response.messages[i].own == 'true') {
-                        $('.messages').append('\
-                            <div class="media text-right mb-3">\
-                                <div class="media-body">\
-                                    <strong class="message-text" data-id="' + response.messages[i].id + '">' + response.messages[i].message_text + '</strong>\
-                                    ' + editedMessage(response.messages[i].edited) + '\
-                                    <small class="d-block" title="' + formatDate(response.messages[i].created_at) + '">' + formatPrettyDate(response.messages[i].created_at) + '</small>\
-                                </div>\
-                            </div>\
-                        ');
-
-                        // <div style="' + getUserAvatar(response.messages[i].avatar) + '" class="user-avatar ml-3"></div>\
-
-                    } else {
-
-                        
-                        $('.messages').append('\
-                        <div class="media mb-3">\
-                                <div style="' + getUserAvatar(response.messages[i].avatar) + '" class="user-avatar mr-3"></div>\
-                                <div class="media-body">\
-                                    <span class="d-block">' + response.messages[i].name + '</span>\
-                                    <strong class="message-text" data-id="' + response.messages[i].id + '">' + response.messages[i].message_text + '</strong>\
-                                    ' + editedMessage(response.messages[i].edited) + '\
-                                    <small class="d-block" title="' + formatDate(response.messages[i].created_at) + '">' + formatPrettyDate(response.messages[i].created_at) + '</small>\
-                                </div>\
-                            </div>\
-                        ');
-                    }
+                    getMessageByType(response.messages[i].message_type, response.messages[i])
                 }
 
-                $('.message-text').each(function() {
+                $('.message-text.type-text').each(function() {
                     var $this = $(this);
 
                     $this.on("dblclick", function () {
@@ -516,4 +551,188 @@ function editRoomData(roomId, roomName, selectUsers) {
             console.log(textStatus, errorThrown);
         }
     });
+}
+
+function handleFileSelect(files){
+    const reader = new FileReader();
+    reader.onload = handleFileLoad;
+    reader.readAsDataURL(files[0]);
+}
+  
+function handleFileLoad(event) {
+    // console.log(event.target.result);
+    // $('.avatar').css('background-image', 'url(' + event.target.result + ')');
+}
+
+Number.prototype.padLeft = function(base,chr){
+    var  len = (String(base || 10).length - String(this).length) + 1;
+    return len > 0? new Array(len).join(chr || '0') + this : this;
+}
+
+function getMessageByType(type, message) {
+    switch(type) {
+        case 'text':
+            if(message.own == 'true') {
+                $('.messages').append('\
+                    <div class="media text-right mb-3">\
+                        <div class="media-body">\
+                            <strong class="message-text type-text" data-id="' + message.id + '">' + message.message_text + '</strong>\
+                            ' + editedMessage(message.edited) + '\
+                            <small class="d-block" title="' + formatDate(message.created_at) + '">' + formatPrettyDate(message.created_at) + '</small>\
+                        </div>\
+                    </div>\
+                ');
+                // <div style="' + getUserAvatar(response.messages[i].avatar) + '" class="user-avatar ml-3"></div>\
+            } else {
+                $('.messages').append('\
+                    <div class="media mb-3">\
+                        <div style="' + getUserAvatar(message.avatar) + '" class="user-avatar mr-3"></div>\
+                        <div class="media-body">\
+                            <span class="d-block">' + message.name + '</span>\
+                            <strong class="message-text" data-id="' + message.id + '">' + message.message_text + '</strong>\
+                            ' + editedMessage(message.edited) + '\
+                            <small class="d-block" title="' + formatDate(message.created_at) + '">' + formatPrettyDate(message.created_at) + '</small>\
+                        </div>\
+                    </div>\
+                ');
+            }
+            break;
+        case 'application/pdf':
+            if(message.own == 'true') {
+                $('.messages').append('\
+                    <div class="media text-right mb-3">\
+                        <div class="media-body">\
+                            <strong class="message-text" data-id="' + message.id + '">\
+                                <a href="https://nodejschat.s3.eu-central-1.amazonaws.com/messages/' + message.message_text + '">\
+                                    ' + withoutDate(message.message_text) + '\
+                                    <i class="far fa-file-pdf"></i>\
+                                </a>\
+                            </strong>\
+                            <small class="d-block" title="' + formatDate(message.created_at) + '">' + formatPrettyDate(message.created_at) + '</small>\
+                        </div>\
+                    </div>\
+                ');
+            } else {
+                $('.messages').append('\
+                    <div class="media mb-3">\
+                        <div style="' + getUserAvatar(message.avatar) + '" class="user-avatar mr-3"></div>\
+                        <div class="media-body">\
+                            <span class="d-block">' + message.name + '</span>\
+                            <strong class="message-text" data-id="' + message.id + '">\
+                                <a href="https://nodejschat.s3.eu-central-1.amazonaws.com/messages/' + message.message_text + '">\
+                                    <i class="far fa-file-pdf"></i>\
+                                    ' + withoutDate(message.message_text) + '</a>\
+                            </strong>\
+                            <small class="d-block" title="' + formatDate(message.created_at) + '">' + formatPrettyDate(message.created_at) + '</small>\
+                        </div>\
+                    </div>\
+                ')
+            }
+            break;
+        case 'image/jpeg':
+        case 'image/png':
+        case 'image/webp':
+        case 'image/gif':
+            if(message.own == 'true') {
+                $('.messages').append('\
+                    <div class="media text-right mb-3">\
+                        <div class="media-body">\
+                            <strong class="message-text" data-id="' + message.id + '">\
+                                <img src="https://nodejschat.s3.eu-central-1.amazonaws.com/messages/' + message.message_text + '" class="img-fluid">\
+                            </strong>\
+                            <small class="d-block mt-2" title="' + formatDate(message.created_at) + '">' + formatPrettyDate(message.created_at) + '</small>\
+                        </div>\
+                    </div>\
+                ');
+            } else {
+                $('.messages').append('\
+                    <div class="media mb-3">\
+                        <div style="' + getUserAvatar(message.avatar) + '" class="user-avatar mr-3"></div>\
+                        <div class="media-body">\
+                            <span class="d-block">' + message.name + '</span>\
+                            <strong class="message-text" data-id="' + message.id + '">\
+                                <img src="https://nodejschat.s3.eu-central-1.amazonaws.com/messages/' + message.message_text + '">\
+                            </strong>\
+                            <small class="d-block mt-2" title="' + formatDate(message.created_at) + '">' + formatPrettyDate(message.created_at) + '</small>\
+                        </div>\
+                    </div>\
+                ')
+            }
+            break;
+        case 'application/x-zip-compressed':
+            if(message.own == 'true') {
+                $('.messages').append('\
+                    <div class="media text-right mb-3">\
+                        <div class="media-body">\
+                            <strong class="message-text" data-id="' + message.id + '">\
+                                <a href="https://nodejschat.s3.eu-central-1.amazonaws.com/messages/' + message.message_text + '">\
+                                    ' + withoutDate(message.message_text) + '\
+                                    <i class="far fa-file-archive"></i>\
+                                </a>\
+                            </strong>\
+                            <small class="d-block" title="' + formatDate(message.created_at) + '">' + formatPrettyDate(message.created_at) + '</small>\
+                        </div>\
+                    </div>\
+                ');
+            } else {
+                $('.messages').append('\
+                    <div class="media mb-3">\
+                        <div style="' + getUserAvatar(message.avatar) + '" class="user-avatar mr-3"></div>\
+                        <div class="media-body">\
+                            <span class="d-block">' + message.name + '</span>\
+                            <strong class="message-text" data-id="' + message.id + '">\
+                                <a href="https://nodejschat.s3.eu-central-1.amazonaws.com/messages/' + message.message_text + '">\
+                                    <i class="far fa-file-archive"></i>\
+                                    ' + withoutDate(message.message_text) + '\
+                                    </a>\
+                            </strong>\
+                            <small class="d-block" title="' + formatDate(message.created_at) + '">' + formatPrettyDate(message.created_at) + '</small>\
+                        </div>\
+                    </div>\
+                ')
+            }
+            break;
+        default:
+            if(message.own == 'true') {
+                $('.messages').append('\
+                    <div class="media text-right mb-3">\
+                        <div class="media-body">\
+                            <strong class="message-text" data-id="' + message.id + '">\
+                                <a href="https://nodejschat.s3.eu-central-1.amazonaws.com/messages/' + message.message_text + '">\
+                                    ' + withoutDate(message.message_text) + '\
+                                    <i class="far fa-file"></i>\
+                                </a>\
+                            </strong>\
+                            <small class="d-block" title="' + formatDate(message.created_at) + '">' + formatPrettyDate(message.created_at) + '</small>\
+                        </div>\
+                    </div>\
+                ');
+            } else {
+                $('.messages').append('\
+                    <div class="media mb-3">\
+                        <div style="' + getUserAvatar(message.avatar) + '" class="user-avatar mr-3"></div>\
+                        <div class="media-body">\
+                            <span class="d-block">' + message.name + '</span>\
+                            <strong class="message-text" data-id="' + message.id + '">\
+                                <a href="https://nodejschat.s3.eu-central-1.amazonaws.com/messages/' + message.message_text + '">\
+                                    <i class="far fa-file"></i>\
+                                    ' + withoutDate(message.message_text) + '\
+                                    </a>\
+                            </strong>\
+                            <small class="d-block" title="' + formatDate(message.created_at) + '">' + formatPrettyDate(message.created_at) + '</small>\
+                        </div>\
+                    </div>\
+                ')
+            }
+            break;
+    }
+}
+
+function withoutDate(text) {
+    var array = text.split('_');
+    
+    array.shift();
+    array.shift();
+
+    return array.join('_');
 }

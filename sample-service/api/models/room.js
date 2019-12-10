@@ -96,7 +96,7 @@ module.exports = class Room {
 
     static getRoomMessages(userId, roomId) {
         return new Promise((resolve, reject) => {
-            const sql = 'SELECT m.id, m.created_at, m.message_text, m.edited, u.email, u.name, u.avatar, IF(m.user_id = ?, "true", "false") AS own FROM messages m LEFT JOIN users u ON m.user_id = u.id WHERE m.room_id = ? ORDER BY m.created_at';
+            const sql = 'SELECT m.id, m.created_at, m.message_text, m.edited, m.message_type, u.email, u.name, u.avatar, IF(m.user_id = ?, "true", "false") AS own FROM messages m LEFT JOIN users u ON m.user_id = u.id WHERE m.room_id = ? ORDER BY m.created_at';
             connection.query(sql, [userId, roomId],
                 function(err, results) {
                     if(err) reject(err);
@@ -116,11 +116,29 @@ module.exports = class Room {
         })
     }
 
-    static sendMessage(userId, roomId, message) {
+    static getMessageById(messageId) {
         return new Promise((resolve, reject) => {
-            const sql = 'INSERT INTO messages (user_id, room_id, message_text) VALUES ?;';
+            const sql = 'SELECT * FROM messages WHERE id = ?' ;
+
+            connection.query(sql, messageId,
+                function(err, results) {
+                    if(err) reject(err);
+
+                    if(!results) {
+                        resolve(null);
+                    }
+
+                    resolve(results[0]);
+                }
+            )
+        })
+    }
+
+    static sendMessage(userId, roomId, message, messageType = 'text') {
+        return new Promise((resolve, reject) => {
+            const sql = 'INSERT INTO messages (user_id, room_id, message_text, message_type) VALUES ?;';
             const values = [
-                [userId, roomId, message]
+                [userId, roomId, message, messageType]
             ];
             
             connection.query(sql, [values],

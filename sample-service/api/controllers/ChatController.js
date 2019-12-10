@@ -1,3 +1,9 @@
+const AWS = require('aws-sdk');
+const s3 = new AWS.S3({
+    accessKeyId: process.env.ACCESS_KEY,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY
+});
+
 const Room = require("../models/room.js");
 
 exports.show = async function (request, response) {
@@ -38,8 +44,10 @@ exports.message = async function(request, response) {
     const roomId = request.body.room;
     const message = request.body.message;
 
+    const insertId = await Room.sendMessage(userId, roomId, message);
+
     response.json({
-        'message': await Room.sendMessage(userId, roomId, message)
+        'message': await Room.getMessageById(insertId.insertId)
     })
 }
 
@@ -57,5 +65,37 @@ exports.destroy = async function(request, response) {
 
     response.json({
         'message': await Room.deleteMessage(messageId)
+    })
+}
+
+exports.file = async function(request, response) {
+    const userId = request.session.user_id;
+
+    const filedata = request.files.message_file;
+    filedata.name = request.body.time + '_' + filedata.name;
+    
+    var base64data = Buffer.from(filedata.data, 'binary');
+
+    const params = {
+        Bucket: process.env.BUCKET_NAME,
+        Key: 'messages/' + filedata.name,
+        Body: base64data,
+        ACL: 'public-read'
+    };
+
+    s3.upload(params, function(err, data) {
+        if (err) {
+            throw err;
+        }
+        console.log(`File uploaded successfully. ${data.Location}`);
+    });
+
+    const roomId = request.body.room_id;
+    const messageType = request.body.message_type;
+
+    const insertId = await Room.sendMessage(userId, roomId, filedata.name, messageType)
+
+    response.json({
+        'message': await Room.getMessageById(insertId.insertId)
     })
 }
