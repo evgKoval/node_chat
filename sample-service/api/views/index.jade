@@ -34,7 +34,9 @@ block content
           form(method='POST', action='/api/chat/message')
             div.input-group.input-send
               input(type='hidden', name='room' value='0')
+              input.d-none(type='file', name='chat_file')
               input.form-control(type='text', placeholder='...', name='message')
+              i.put-files.fas.fa-cloud-download-alt
               div.input-group-append
                 button.btn.btn-primary.btn-send(type='submit') Send
 

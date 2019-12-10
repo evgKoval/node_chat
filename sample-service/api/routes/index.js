@@ -25,6 +25,7 @@ router.put('/api/room', RoomController.update);
 
 router.get('/api/chat/:id', ChatController.show);
 router.post('/api/chat', ChatController.store);
+router.post('/api/chat/file', ChatController.file);
 router.post('/api/chat/message', ChatController.message);
 router.put('/api/chat/message', ChatController.update);
 router.delete('/api/chat/message', ChatController.destroy);

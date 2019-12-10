@@ -70,6 +70,7 @@ a {
   padding: 10px 20px;
   border-radius: 15px;
   align-self: start;
+  max-width: 100%;
 }
 
 .media:last-child {
@@ -143,4 +144,33 @@ a {
   border-top-right-radius: 0;
   position: relative;
   left: -1px;
+}
+
+.put-files {
+  position: absolute;
+  font-size: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 75px;
+  color: grey;
+  transition: .15s;
+  z-index: 4;
+  cursor: pointer;
+}
+
+.put-files:hover {
+  color: #28a745;
+}
+
+.input-send .form-control {
+  padding-right: 47px;
+}
+
+.fa-file-pdf, .fa-file, .fa-file-archive {
+  font-size: 30px;
+  background-color: rgba(0, 0, 0, 0.075);
+  padding: 24px;
+  border-radius: 50%;
+  margin-left: 0.75rem;
+  margin-bottom: 0.5rem;
 }
