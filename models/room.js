@@ -1,14 +1,14 @@
 var DataBaseHandler = require("../config/DataBaseHandler");
 var dataBaseHandler = new DataBaseHandler();
 
-var MongoDB = require('../config/MongoDB');
-var mongoDB = new MongoDB();
+// var MongoDB = require('../config/MongoDB');
+// var mongoDB = new MongoDB();
 
 var connection = dataBaseHandler.createConnection();
-var connectionMongo = null; 
-mongoDB.createConnection().then(res => {
-    connectionMongo = res;
-});
+// var connectionMongo = null; 
+// mongoDB.createConnection().then(res => {
+//     connectionMongo = res;
+// });
  
 module.exports = class Room {
     static all() {
@@ -109,10 +109,10 @@ module.exports = class Room {
                 }
             );
 
-            const dbo = connectionMongo.db("myapp");
-            dbo.collection("messages").find({}).toArray(function(err, result) {
-                if (err) throw err;
-            });
+            // const dbo = connectionMongo.db("myapp");
+            // dbo.collection("messages").find({}).toArray(function(err, result) {
+            //     if (err) throw err;
+            // });
         })
     }
 
@@ -155,18 +155,18 @@ module.exports = class Room {
                 }
             )
 
-            const data = {
-                created_at: new Date(),
-                message_text: message,
-                room_id: parseInt(roomId),
-                user_id: userId,
-                edited: 0
-            };
+            // const data = {
+            //     created_at: new Date(),
+            //     message_text: message,
+            //     room_id: parseInt(roomId),
+            //     user_id: userId,
+            //     edited: 0
+            // };
 
-            const dbo = connectionMongo.db("myapp");
-            dbo.collection("messages").insertOne(data, function(err, res) {
-                if (err) throw err;
-            });
+            // const dbo = connectionMongo.db("myapp");
+            // dbo.collection("messages").insertOne(data, function(err, res) {
+            //     if (err) throw err;
+            // });
         })
     }
 
